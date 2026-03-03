@@ -13,7 +13,7 @@ normalized_admission_data_sampled = normalized_admission_data
 split_index = int(0.8 * len(normalized_admission_data_sampled))
 
 train_data = normalized_admission_data_sampled[:split_index]
-test_data = normalized_admission_data_sampled[split_index:]
+test_data = normalized_admission_data_sampled[split_index:] 
 
 
 
@@ -38,8 +38,10 @@ model = NeuralNetwork(7)
 model.add_layer(8,Activations.RELU)
 model.add_layer(4,Activations.RELU)
 model.add_layer(1,Activations.LINEAR)
+model.compile(batch_size=32,epochs=100,learning_rate=0.01)
 
-model.train(train_data_input,train_data_expected_output,epochs=5)
+
+model.train(train_data_input,train_data_expected_output)
 
 model.test(test_data_input,test_data_expected_output)
 
