@@ -112,4 +112,4 @@ class NeuralNetwork:
        self.test(X_test,Y_test)
        
 
-
+ 
