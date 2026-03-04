@@ -63,14 +63,28 @@ class Layer:
         #batch size as it is not necessary that now of elements in last batch will be same
         m = previous_layer_values.shape[0]
 
+
+        dW_avg = gradient * (1/m)
+
+         #for bias we will take average of delta across all samples in the batch
+        db_avg = np.sum(delta, axis=0, keepdims=True) * (1/m)
+
+        # save diagnostics for logging (before update)
+        self.last_dW = dW_avg.copy()
+        self.last_db = db_avg.copy()
+        self.weight_norm_before = np.linalg.norm(self.weights)
+
         #gradient_descent algorithm
         # W = W - learning_rate * (summation(dL/dW)) * (1/n)
-        self.weights = self.weights -  gradient * learning_rate * (1/m)
+        self.weights = self.weights -  learning_rate * dW_avg
         
-        #for bias we will take average of delta across all samples in the batch
-        db = np.sum(delta, axis=0, keepdims=True) * learning_rate * (1/m)
+       
         # bias_gradient = delta * learning_rate
-        self.bias = self.bias - db
+        self.bias = self.bias - learning_rate*db_avg
+
+
+        ##For logging
+
 
         return newdelta
     

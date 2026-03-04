@@ -3,6 +3,7 @@ import numpy as np
 import os
 from networks import NeuralNetwork
 from activation import Activations
+from visualizer import Visualizer
 
 admission_Data = pd.read_csv("../datasets/admission_data.csv")
 
@@ -44,6 +45,14 @@ model.compile(batch_size=32,epochs=100,learning_rate=0.01)
 model.train(train_data_input,train_data_expected_output)
 
 model.test(test_data_input,test_data_expected_output)
+
+viz = Visualizer(model.history)
+# viz.plot_loss()
+# viz.plot_grad_norms()
+
+for index, layer in enumerate(model.layers):
+    viz.plot_loss_vs_weight(index)
+
 
 
 

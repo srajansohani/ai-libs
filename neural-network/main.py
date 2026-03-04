@@ -1,5 +1,6 @@
 import numpy as np
 import time
+import matplotlib.pyplot as plt
 # from activation import Activations
 # from networks import NeuralNetwork
 # from layer import Layer
@@ -33,17 +34,5 @@ import time
 
 
 
-def create_batches(X, y, batch_size, shuffle=True,):
-        n_samples = X.shape[0]
-        indices = np.arange(n_samples)
-
-        if shuffle:
-            np.random.shuffle(indices)
-
-        for i in range(0, n_samples, batch_size):
-            batch_indices = indices[i:i+batch_size]
-            yield X[batch_indices], y[batch_indices]
-
-x = create_batches(np.array([[1,2],[3,4]]),np.array([[1],[2]]),1)
-for value in x:
-    print(value)
+plt.plot([1,2,3],[4,5,6])
+plt.show()

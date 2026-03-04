@@ -10,6 +10,12 @@ class NeuralNetwork:
     def __init__(self,input_neurons):
         self.layers = []
         self.input_neurons = input_neurons
+        self.history = {
+        "epochs": [],
+        "train_loss": [],
+        "val_loss": [],
+        "layers": {}   # will be filled with indices when compile() is called
+    }
         pass
 
     def add_layer(self,neurons,activation=Activations.SIGMOID):
@@ -49,8 +55,6 @@ class NeuralNetwork:
     
     def train(self,input_data,expected_output_data):
        elements_covered = 0
-       correct = 0
-       incorrect = 0
        epochs = self.epochs
        total_samples = len(input_data)
        for epoch in range(epochs):
@@ -60,9 +64,9 @@ class NeuralNetwork:
                 
                 output = self.forward(input)
 
-                loss = self.loss.value(output,expected_output)
+                batch_loss = self.loss.value(output,expected_output)
 
-                total_loss += loss*len(input)
+                total_loss += batch_loss*len(input)
 
                 delta = self.loss.derivative(output,expected_output)
 
@@ -70,11 +74,26 @@ class NeuralNetwork:
 
                 elements_covered += len(input)
                 Utils.show_progress(elements_covered,total_samples,batch_number=batch_no + 1)
-          total_loss = total_loss / total_samples
-          print(f"\nEpoch {epoch+1}/{self.epochs} - Loss: {total_loss:.6f}")
+          epoch_loss = total_loss / total_samples
+
+          #For diagnostics and logging
+          self.history["epochs"].append(epoch)
+          self.history["train_loss"].append(epoch_loss)
+
+          #Computing per layer diagnostics
+          for idx,layer in enumerate(self.layers):
+              #grad_norm using last_dW saved
+              grad_norm = np.linalg.norm(layer.last_dW) if hasattr(layer, "last_dW") else 0
+              #weight_norm after update
+              weight_norm = np.linalg.norm(layer.weights)
+
+              self.history["layers"][idx]["grad_norm"].append(grad_norm)
+              self.history["layers"][idx]["weight_norm"].append(weight_norm)
+          print(f"\nEpoch {epoch+1}/{self.epochs} - Loss: {epoch_loss:.6f}")
+
 
     
-    def test(self,input_data,expected_output_data):
+    def test(self,input_data,expected_output_data,log_to_history=True):
         elements_covered = 0
         total_samples = len(input_data)
         for batch_no, (input,expected_output) in enumerate(Utils.create_batches(input_data,expected_output_data,self.batch_size,shuffle=False)):
@@ -88,7 +107,11 @@ class NeuralNetwork:
             print("testing ....")
             Utils.show_progress(elements_covered,total_samples,batch_number=batch_no + 1)
         
-        print(f"\n Test Loss: {total_loss/total_samples:.6f}")
+        test_loss = total_loss / total_samples
+        print(f"\n Test Loss: {test_loss:.6f}")
+        if log_to_history:
+        # append val loss aligned with last epoch index (or None if no train done yet)
+            self.history["val_loss"].append(test_loss)
 
 
     def compile(self,optimizer="adam",batch_size=32,learning_rate = 0.01,loss=Loss.MSE,epochs=1):
@@ -97,19 +120,26 @@ class NeuralNetwork:
         self.learning_rate = learning_rate
         self.loss = loss
         self.epochs = epochs
-        for layer in self.layers:
-            layer.compile(optimizer,batch_size)
-        pass
+        for idx, layer in enumerate(self.layers):
+            layer.compile(optimizer, batch_size)
+            # ensure history structure for layer diagnostics
+            if idx not in self.history["layers"]:
+                self.history["layers"][idx] = {
+                    "weight_norm": [],
+                    "grad_norm": []
+                    # add more metrics here if you want
+                }
 
     # Expected 2 d numpy arrays of X(input ) as (Dataponts,features) and y(expected output) as (Datapoints,output_neurons(expected features))
     def fit(self,X,Y,split_ratio=0.8):
-        
-       X_train, X_test = X[:int(len(X)*split_ratio)]
-       Y_train, Y_test = Y[:int(len(Y)*split_ratio)]
+       n = len(X)
+       split = int(n * split_ratio)
+       X_train, X_val = X[:split], X[split:]
+       Y_train, Y_val = Y[:split], Y[split:]
 
-       self.train(X_train,Y_train)
-
-       self.test(X_test,Y_test)
+       self.train(X_train, Y_train)
+       val_loss = self.test(X_val, Y_val, log_to_history=True)
+       return val_loss
        
 
  
