@@ -37,11 +37,16 @@ class Matrix:
     def add(matrix1,matrix2):
         if(matrix1.rows != matrix2.rows or matrix1.columns != matrix2.columns):
             raise Exception("Matrix addition cannot occur as no of rows and columns in both matrices are not equal" )
+        try: 
+            result = Matrix(matrix1.rows,matrix1.columns)
+            for i in range(matrix1.rows):
+                for j in range(matrix1.columns):
+                    result.data[i][j] = matrix1.data[i][j] + matrix2.data[i][j]
+            return result
+        
+        except Exception as e:
+            print(e)
 
-        result = Matrix(matrix1.rows,matrix1.columns)
-        for i in range(matrix1.rows):
-            for j in range(matrix1.columns):
-                result.data[i][j] = matrix1.data[i][j] + matrix2.data[i][j]
         
         return result
     
@@ -79,16 +84,40 @@ class Matrix:
         return [self.rows,self.columns]
     
     def multiply_scalar(self,scalar):
+        result = Matrix(self.rows,self.columns)
         for i in range(self.rows):
             for j in range(self.columns):
-                self.data[i][j] = self.data[i][j] * scalar
-        return self
+                result.data[i][j] = self.data[i][j] * scalar
+        return result
         
             
     @staticmethod
     def makeRow(array):
-        row = []
-        for i in range(len(array)):
-            row.append([array[i]])
+        return Matrix(1,len(array),[array])
+    
 
-        return Matrix(1,len(array),row)
+    def apply_function(self,func):
+        for i in range(self.rows):
+            for j in range(self.columns):
+                self.data[i][j] = func(self.data[i][j])
+        return self
+    
+
+    @staticmethod
+    def makeColumn(array):
+        result = Matrix(len(array),1)
+        for i in range(len(array)):
+            result.data[i][0] = array[i]
+        return result
+    
+    @staticmethod
+    def multiplyElementWise(matrix1,matrix2):
+        if(matrix1.rows != matrix2.rows or matrix1.columns != matrix2.columns):
+            raise Exception("Element wise multiplication cannot occur as no of rows and columns in both matrices are not equal" )
+
+        result = Matrix(matrix1.rows,matrix1.columns)
+        for i in range(matrix1.rows):
+            for j in range(matrix1.columns):
+                result.data[i][j] = matrix1.data[i][j] * matrix2.data[i][j]
+        
+        return result
