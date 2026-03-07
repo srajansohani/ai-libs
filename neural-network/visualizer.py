@@ -24,13 +24,13 @@ class Visualizer:
     
     def __init__(self, history):
         self.history = history
-        
+
     def plot_loss(self):
         epochs = self.history["epochs"]
         plt.figure()
         plt.plot(epochs, self.history["train_loss"], label="train")
         if self.history.get("val_loss"):
-            # val_loss may be shorter or same length
+            
             plt.plot(range(len(self.history["val_loss"])), self.history["val_loss"], label="val")
         plt.xlabel("Epoch")
         plt.ylabel("Loss")
@@ -70,3 +70,5 @@ class Visualizer:
         plt.ylabel("Train Loss")
         plt.title(f"Loss vs Weight Norm (Layer {layer_idx})")
         plt.show()
+
+    
