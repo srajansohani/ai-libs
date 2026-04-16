@@ -78,8 +78,8 @@ for epoch in range(epochs):
     for question,answer in dataloader:
         optimizer.zero_grad()
         prediction = model(question)
-        print("Prediction:", prediction.shape)
-        print("Answer:", answer.shape)
+        prediction = prediction.view(-1, prediction.shape[-1])
+        answer = answer.view(-1) 
         loss = criterion(prediction,answer)
 
        
