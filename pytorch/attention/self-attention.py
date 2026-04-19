@@ -36,3 +36,9 @@ attention_score = Q @ K.T ## here we are taking transpose of K matrix to make it
 
 contextual_embeddings = ((attention_score) @ V)/(3**0.5) ## here 3 is the dimension of K matrix
 
+
+
+
+
+
+
