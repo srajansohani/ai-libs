@@ -10,6 +10,7 @@ class SimpleRNN(nn.Module):
 
     def forward(self,x):
         x = self.embedding(x)
+        print(x.shape)
         hidden,final = self.rnn(x)
         output = self.fc(final)
         return output
