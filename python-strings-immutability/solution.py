@@ -1,21 +1,12 @@
 def replace_char_at(s: str, index: int, ch: str) -> str:
-    """
-    Return a new string equal to `s` with the character at
-    position `index` replaced by `ch`. `index` may be negative.
-    `ch` may be any string, not necessarily one character long.
-
-    If `index` is out of range (index >= len(s) or
-    index < -len(s)), return `s` unchanged.
-    Do not use the replace() method.
-
-    Example: replace_char_at("hello", 0, "J") -> "Jello"
-    """
     if index >= len(s) or index < -len(s):
         return s
-    if index == -1:
-        return s[0:index] + ch
-    return s[0:index] + ch + s[index+1:]
-    
+
+    # Convert negative index to its positive equivalent
+    if index < 0:
+        index += len(s)
+
+    return s[:index] + ch + s[index + 1 :]
 
 
 def insert_at(s: str, index: int, text: str) -> str:
